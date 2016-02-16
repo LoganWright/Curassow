@@ -107,7 +107,8 @@ class HTTPParser {
     if let contentLength = request.contentLength {
       let remainingContentLength = contentLength - startOfBody.count
       let bodyBytes = startOfBody + (try readBody(maxLength: remainingContentLength))
-      request.body = try parseBody(bodyBytes, contentLength: contentLength)
+      let bodyString = try parseBody(bodyBytes, contentLength: contentLength)
+      request.body = Array(bodyString.utf8)
     }
 
     return request

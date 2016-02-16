@@ -30,7 +30,6 @@ private let system_select = Darwin.select
 private let system_pipe = Darwin.pipe
 #endif
 
-
 struct SocketError : ErrorType, CustomStringConvertible {
   let function: String
   let number: Int32
@@ -149,20 +148,25 @@ class Socket {
   }
 
   func send(output: String) {
-    output.withCString { bytes in
-#if os(Linux)
-    let flags = Int32(MSG_NOSIGNAL)
-#else
-    let flags = Int32(0)
-#endif
-      system_send(descriptor, bytes, Int(strlen(bytes)), flags)
-    }
+    send(Array(output.utf8))
   }
 
+  func send(output: [UInt8]) {
+    #if os(Linux)
+        let flags = Int32(MSG_NOSIGNAL)
+    #else
+        let flags = Int32(0)
+    #endif
+    system_send(descriptor, output, output.count, flags)
+  }
+    
+
   func write(output: String) {
-    output.withCString { bytes in
-      system_write(descriptor, bytes, Int(strlen(bytes)))
-    }
+    write(Array(output.utf8))
+  }
+    
+  func write(bytes: [UInt8]) {
+    system_write(descriptor, bytes, Int(bytes.count))
   }
 
   func read(bytes: Int) throws -> [CChar] {

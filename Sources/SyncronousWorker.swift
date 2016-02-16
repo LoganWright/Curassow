@@ -143,18 +143,13 @@ func sendResponse(client: Socket, response: ResponseType) {
     }
   }
 
+  let bytes = response.body ?? []
+  
   if !hasLength {
-      if let body = response.body {
-      // TODO body shouldn't be a string
-      client.send("Content-Length: \(body.characters.count)\r\n")
-    } else {
-      client.send("Content-Length: 0\r\n")
-    }
+    client.send("Content-Length: \(bytes.count)\r\n")
   }
 
   client.send("\r\n")
 
-  if let body = response.body {
-    client.send(body)
-  }
+  client.send(bytes)
 }
