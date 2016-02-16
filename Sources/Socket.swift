@@ -30,6 +30,8 @@ private let system_select = Darwin.select
 private let system_pipe = Darwin.pipe
 #endif
 
+import Inquiline
+
 struct SocketError : ErrorType, CustomStringConvertible {
   let function: String
   let number: Int32
@@ -148,10 +150,10 @@ class Socket {
   }
 
   func send(output: String) {
-    send(Array(output.utf8))
+    send(Array(output.byteArray))
   }
 
-  func send(output: [UInt8]) {
+  func send(output: [Int8]) {
     #if os(Linux)
         let flags = Int32(MSG_NOSIGNAL)
     #else

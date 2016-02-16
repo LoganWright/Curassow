@@ -143,13 +143,19 @@ func sendResponse(client: Socket, response: ResponseType) {
     }
   }
 
-  let bytes = response.body ?? []
-  
+  var mutable = response.body
+    
   if !hasLength {
-    client.send("Content-Length: \(bytes.count)\r\n")
+    var collection: [Int8] = []
+    while let next = mutable?.next() {
+        collection.append(next)
+    }
+    client.send("Content-Length: \(collection.count)\r\n")
+    client.send("\r\n")
+    client.send(collection)
+  } else {
+    while let next = mutable?.next() {
+        client.send([next])
+    }
   }
-
-  client.send("\r\n")
-
-  client.send(bytes)
 }
