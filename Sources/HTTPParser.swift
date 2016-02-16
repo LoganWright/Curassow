@@ -7,7 +7,6 @@ import Darwin.C
 import Nest
 import Inquiline
 
-
 enum HTTPParserError : ErrorType {
   case BadSyntax(String)
   case BadVersion(String)
@@ -17,13 +16,13 @@ enum HTTPParserError : ErrorType {
   func response() -> ResponseType {
     switch self {
     case let .BadSyntax(syntax):
-      return Response(.BadRequest, contentType: "text/plain", body: "Bad Syntax (\(syntax))")
+      return Response(.BadRequest, contentType: "text/plain", content: "Bad Syntax (\(syntax))")
     case let .BadVersion(version):
-      return Response(.BadRequest, contentType: "text/plain", body: "Bad Version (\(version))")
+      return Response(.BadRequest, contentType: "text/plain", content: "Bad Version (\(version))")
     case .Incomplete:
-      return Response(.BadRequest, contentType: "text/plain", body: "Incomplete HTTP Request")
+      return Response(.BadRequest, contentType: "text/plain", content: "Incomplete HTTP Request")
     case .Internal:
-      return Response(.InternalServerError, contentType: "text/plain", body: "Internal Server Error")
+      return Response(.InternalServerError, contentType: "text/plain", content: "Internal Server Error")
     }
   }
 }
@@ -108,7 +107,7 @@ class HTTPParser {
       let remainingContentLength = contentLength - startOfBody.count
       let bodyBytes = startOfBody + (try readBody(maxLength: remainingContentLength))
       let bodyString = try parseBody(bodyBytes, contentLength: contentLength)
-      request.body = Stream(bodyString.byteArray)
+      request.content = bodyString
     }
 
     return request

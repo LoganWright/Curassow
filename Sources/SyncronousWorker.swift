@@ -116,7 +116,7 @@ final class SyncronousWorker : WorkerType {
       response = error.response()
     } catch {
       print("[worker] Unknown error: \(error)")
-      response = Response(.InternalServerError, contentType: "text/plain", body: "Internal Server Error")
+      response = Response(.InternalServerError, contentType: "text/plain", content: "Internal Server Error")
     }
 
     sendResponse(client, response: response)
@@ -143,19 +143,17 @@ func sendResponse(client: Socket, response: ResponseType) {
     }
   }
 
-  var mutable = response.body
     
   if !hasLength {
-    var collection: [Byte] = []
+    var collection: [Int8] = []
+    var mutable = response.body
     while let next = mutable?.next() {
         collection.append(next)
     }
     client.send("Content-Length: \(collection.count)\r\n")
     client.send("\r\n")
-    client.send(collection)
-  } else {
-    while let next = mutable?.next() {
-        client.send([next])
-    }
+    client.send(BytesPayload(bytes: collection))
+  } else if let body = response.body {
+    client.send(body)
   }
 }

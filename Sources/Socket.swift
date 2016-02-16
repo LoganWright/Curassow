@@ -150,17 +150,22 @@ class Socket {
     system_shutdown(descriptor, Int32(SHUT_RDWR))
   }
 
-  func send(output: String) {
-    send(Array(output.byteArray))
+  func send(output: PayloadConvertible) {
+    send(output.toPayload())
   }
 
-  func send(output: [Byte]) {
+  func send(output: PayloadType) {
     #if os(Linux)
         let flags = Int32(MSG_NOSIGNAL)
     #else
         let flags = Int32(0)
     #endif
-    system_send(descriptor, output, output.count, flags)
+    
+    var mutable = output
+    while let next = mutable.next() {
+        var mutable = next
+        system_send(descriptor, &mutable, 1, flags)
+    }
   }
     
 
