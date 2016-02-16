@@ -146,7 +146,7 @@ func sendResponse(client: Socket, response: ResponseType) {
   var mutable = response.body
     
   if !hasLength {
-    var collection: [Int8] = []
+    var collection: [Byte] = []
     while let next = mutable?.next() {
         collection.append(next)
     }

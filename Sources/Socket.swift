@@ -30,6 +30,7 @@ private let system_select = Darwin.select
 private let system_pipe = Darwin.pipe
 #endif
 
+import Nest
 import Inquiline
 
 struct SocketError : ErrorType, CustomStringConvertible {
@@ -153,7 +154,7 @@ class Socket {
     send(Array(output.byteArray))
   }
 
-  func send(output: [Int8]) {
+  func send(output: [Byte]) {
     #if os(Linux)
         let flags = Int32(MSG_NOSIGNAL)
     #else
